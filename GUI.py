@@ -9,6 +9,11 @@ class VirtuailorBasicGUI(QtWidgets.QDialog):
     base_line = None
 
     def populate_form(self, defaults):
+        """
+        Populates the form with the default values and sets up the layout.
+        :param defaults: Dictionary containing default values for the form fields.
+        :return: None
+        """
         layout = QtWidgets.QVBoxLayout() # TODO implement exit()
         layout.addWidget(QtWidgets.QLabel("Virtuailor- \n\n Please Choose Address range (in hex)"))
         layout.addWidget(QtWidgets.QLabel("\n In case you would like to target all the binary, just leave the "
@@ -45,11 +50,21 @@ class VirtuailorBasicGUI(QtWidgets.QDialog):
         self.setLayout(layout)
 
     def __init__(self, cb, defaults):
+        """
+        Initializes the VirtuailorBasicGUI class.
+        :param cb: Callback function to be called when the form is submitted.
+        :param defaults: Dictionary containing default values for the form fields.
+        :return: None
+        """
         self.values_cb = cb
         QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
         self.populate_form(defaults)
 
     def on_button_clicked(self):
+        """
+        Handles the event when the OK button is clicked.
+        :return: None
+        """
         start = int(self.start_line.text(), 16)
         end = int(self.stop_line.text(), 16)
 
@@ -57,6 +72,9 @@ class VirtuailorBasicGUI(QtWidgets.QDialog):
         self.close()
 
     def on_button_clicked_cancel(self):
+        """
+        Handles the event when the Cancel button is clicked.
+        :return: None
+        """
         self.start_line.text = "banana"
         self.close()
-

@@ -11,11 +11,20 @@ idaapi.require("GUI")
 from vtableAddress import REGISTERS
 
 def get_all_functions():
+    """
+    Prints all functions in the IDA database along with their addresses.
+    :return: None
+    """
     for func in idautils.Functions():
         print(hex(func), idc.get_func_name(func))
 
 
 def get_xref_code_to_func(func_addr):
+    """
+    Retrieves all code cross-references to a given function.
+    :param func_addr: Address of the function.
+    :return: Dictionary with function names as keys and lists containing xref information as values.
+    """
     a = idautils.XrefsTo(func_addr, 1)
     addr = {}
     for xref in a:
@@ -27,6 +36,12 @@ def get_xref_code_to_func(func_addr):
 
 
 def add_bp_to_virtual_calls(cur_addr, end):
+    """
+    Adds breakpoints to virtual calls within a given address range.
+    :param cur_addr: Starting address of the range.
+    :param end: Ending address of the range.
+    :return: None
+    """
     while cur_addr < end:
         if cur_addr == idc.BADADDR:
             break
@@ -39,12 +54,21 @@ def add_bp_to_virtual_calls(cur_addr, end):
 
 
 def set_values(start, end):
+    """
+    Sets the start and end values for the address range.
+    :param start: Starting address of the range.
+    :param end: Ending address of the range.
+    :return: Tuple containing the start and end addresses.
+    """
     start = start
     end = end
     return start, end
 
 
 if __name__ == '__main__':
+    """
+    Main block of the script. Initializes the GUI, sets the address range, and adds breakpoints to virtual calls.
+    """
     start_addr_range = ida_ida.inf_get_min_ea()  # You can change the virtual calls address range
     end_addr_range = ida_ida.inf_get_max_ea()
     oldTo = idaapi.set_script_timeout(0)
@@ -55,4 +79,3 @@ if __name__ == '__main__':
         print("Virtuailor - Started")
         add_bp_to_virtual_calls(int(gui.start_line.text(),16), int(gui.stop_line.text(), 16))
         print("Virtuailor - Finished")
-

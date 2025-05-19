@@ -69,30 +69,40 @@ class Condition:
 
 
 def define_function_trace(adr):
+    """
+    Sets a breakpoint at the given address and enables function tracing.
+    :param adr: Address where the breakpoint should be set.
+    :return: None
+    """
     return idc.set_bpt_attr(adr, idc.BPTATTR_FLAGS, idc.BPT_ENABLED | idc.BPT_TRACE | idc.BPT_TRACEON | idc.BPT_TRACE_FUNC) #idc.BPT_BRK |
 
 
 def delete_bp(adr):
+    """
+    Deletes the breakpoint at the given address.
+    :param adr: Address where the breakpoint should be deleted.
+    :return: None
+    """
     idaapi.del_bpt(adr)
 
 
 def get_bpt(adr):
     """
-    :param adr: the bp address
-    :return: the bpt_t object of the breakpoint in the address
+    Retrieves the breakpoint object at the given address.
+    :param adr: Address of the breakpoint.
+    :return: Breakpoint object (bpt_t) at the given address.
     """
     bpt = idaapi.bpt_t()
     idaapi.get_bpt(adr, bpt)
     return bpt
 
 
-
-
 def add(ea, cond_user=''):
     """
-    :param ea: Address of the breakpoint
-    :param cond_user: break point condition
-    :return: not relevant
+    Adds a breakpoint at the given address with an optional condition.
+    :param ea: Address of the breakpoint.
+    :param cond_user: Breakpoint condition (optional).
+    :return: Breakpoint object.
     """
     if cond_user == '':
         cond = Condition(0)
@@ -101,4 +111,3 @@ def add(ea, cond_user=''):
     hook = AddBreakPoint(ea, cond)
     hook.set()
     return hook
-

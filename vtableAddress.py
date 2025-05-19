@@ -14,6 +14,10 @@ REGISTERS = ['eax', 'ebx', 'ecx', 'edx', 'rax', 'rbx', 'rcx', 'rdx', 'rdi', 'rsi
 
 
 def get_processor_architecture():
+    """
+    Determines the processor architecture and whether it is 64-bit or 32-bit.
+    :return: Tuple containing the architecture ("Intel" or "ARM") and a boolean indicating if it is 64-bit.
+    """
     arch = "Intel"
     info = idaapi.get_inf_structure()
     if info.procName == "ARM":
@@ -27,6 +31,11 @@ def get_processor_architecture():
 
 
 def get_local_var_value_64(loc_var_name):
+    """
+    Retrieves the value of a local variable in a 64-bit architecture.
+    :param loc_var_name: Name of the local variable.
+    :return: Value of the local variable.
+    """
     frame = ida_frame.get_frame(idc.here())
     loc_var = ida_struct.get_member_by_name(frame, loc_var_name)
     loc_var_start = loc_var.soff
@@ -36,6 +45,10 @@ def get_local_var_value_64(loc_var_name):
 
 
 def get_arch_dct():
+    """
+    Retrieves the architecture dictionary based on the processor architecture.
+    :return: Dictionary containing architecture-specific information.
+    """
     arch, is_64 = get_processor_architecture()
     if arch != "Error" or (arch == "ARM" and not is_64):
         dct_arch = {}
@@ -55,6 +68,7 @@ def get_arch_dct():
 
 def get_con2_var_or_num(i_cnt, cur_addr):
     """
+    Retrieves the register and offset for the virtual call.
     :param i_cnt: the register of the virtual call
     :param cur_addr: the current address in the memory
     :return: "success" string and the address of the vtable's location. if it fails it sends the reason and -1
@@ -100,6 +114,13 @@ def get_con2_var_or_num(i_cnt, cur_addr):
 
 
 def get_bp_condition(start_addr, register_vtable, offset):
+    """
+    Retrieves the breakpoint condition based on the architecture.
+    :param start_addr: Start address of the virtual call.
+    :param register_vtable: Register used in the virtual call.
+    :param offset: Offset of the function in the vtable.
+    :return: Breakpoint condition as a string.
+    """
     arch, is_64 = get_processor_architecture()
     file_name = "BPCond.py"
     if arch == "Intel":
@@ -120,6 +141,7 @@ def get_bp_condition(start_addr, register_vtable, offset):
 
 def write_vtable2file(start_addr):
     """
+    Writes the vtable information to a file and retrieves the breakpoint condition.
     :param start_addr: The start address of the virtual call
     :return: The break point condition and the break point address
     """

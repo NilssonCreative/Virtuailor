@@ -6,11 +6,21 @@
 #    * offset -> The offset of the relevant function from the vtable base pointer
 
 def make_func(ea):
+    """
+    Creates a function at the given address.
+    :param ea: Address where the function should be created.
+    :return: Tuple containing the result of making code and making function.
+    """
     code_err = idc.MakeCode(ea)
     func_err= idc.MakeFunction(ea)
     return code_err, func_err
 
 def fix_arm_vtable(vfunc_addr):
+    """
+    Fixes the ARM vtable by making code and function at the given address.
+    :param vfunc_addr: Address of the virtual function.
+    :return: None
+    """
     if not is_code(vfunc_addr):
         code_err, func_err = make_func(vfunc_addr)
         #if code_err == 0:
@@ -18,10 +28,9 @@ def fix_arm_vtable(vfunc_addr):
         #elif not func_err:
             #print "Failed to create function, at". hex(vfunc_addr)
 
-
-
 def get_fixed_name_for_object(address, prefix=""):
     """
+    Calculates a fixed name for an object based on its address and segment offset.
     :param address: string, the object's address we want to calculate its offset
     :param prefix: string, a prefix for the object name
     :param suffix: string, a suffix for the object name
@@ -38,6 +47,7 @@ def get_fixed_name_for_object(address, prefix=""):
 
 def get_vtable_and_vfunc_addr(is_brac, register_vtable, offset):
     """
+    Retrieves the addresses of the vtable and the virtual function from the relevant register.
     :param is_brac: number, if the call/ assignment is byRef the value is -1
     :param register_vtable: string, the register used in the virtual call
     :param offset: number, the offset of the function in the vtables used in on the bp opcode
@@ -55,7 +65,13 @@ def get_vtable_and_vfunc_addr(is_brac, register_vtable, offset):
         return p_vtable_addr, v_func_addr
 
 def add_comment_to_struct_members(struct_id, vtable_func_offset, start_address):
-     # add comment to the vtable struct members
+    """
+    Adds a comment to the vtable struct members.
+    :param struct_id: ID of the structure.
+    :param vtable_func_offset: Offset of the function in the vtable.
+    :param start_address: Address where the function was called from.
+    :return: Success status of adding the comment.
+    """
     cur_cmt = idc.get_member_cmt(struct_id, vtable_func_offset, 1)
     new_cmt = ""
     if cur_cmt:
@@ -69,6 +85,14 @@ def add_comment_to_struct_members(struct_id, vtable_func_offset, start_address):
     return  succ1
 
 def add_all_functions_to_struct(start_address, struct_id, p_vtable_addr, offset):
+    """
+    Adds all functions from the vtable to the structure.
+    :param start_address: Address where the function was called from.
+    :param struct_id: ID of the structure.
+    :param p_vtable_addr: Address of the vtable.
+    :param offset: Offset of the function in the vtable.
+    :return: None
+    """
     vtable_func_offset = 0
     vtable_func_value = idc.read_dbg_qword(p_vtable_addr)
     # Add all the vtable's functions to the vtable struct
@@ -93,8 +117,15 @@ def add_all_functions_to_struct(start_address, struct_id, p_vtable_addr, offset)
         vtable_func_offset += 8
         vtable_func_value = idc.read_dbg_qword(p_vtable_addr + vtable_func_offset)
 
-
 def create_vtable_struct(start_address, vtable_name, p_vtable_addr, offset):
+    """
+    Creates a structure for the vtable.
+    :param start_address: Address where the function was called from.
+    :param vtable_name: Name of the vtable.
+    :param p_vtable_addr: Address of the vtable.
+    :param offset: Offset of the function in the vtable.
+    :return: None
+    """
     struct_name = vtable_name + "_struct"
     struct_id = add_struc(-1, struct_name, 0)
     if struct_id != idc.BADADDR:
@@ -109,6 +140,13 @@ def create_vtable_struct(start_address, vtable_name, p_vtable_addr, offset):
             print ("Failed to create struct: " +  struct_name)
 
 def do_logic(virtual_call_addr, register_vtable, offset):
+    """
+    Performs the main logic for handling the virtual call.
+    :param virtual_call_addr: Address of the virtual call.
+    :param register_vtable: Register used in the virtual call.
+    :param offset: Offset of the function in the vtable.
+    :return: None
+    """
     # Checks if the assignment was beRef or byVal
     is_brac_assign = idc.print_operand(int(idc.get_reg_value("pc")), 1).find('[')
     # Checks if the assignment was oobeRef or byVal
